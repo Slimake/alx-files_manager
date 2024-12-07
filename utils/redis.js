@@ -10,7 +10,7 @@ class RedisClient {
   }
 
   isAlive() {
-    if (this.client.connected) {
+    if (!this.client.connected) {
       return true;
     }
     return false;
