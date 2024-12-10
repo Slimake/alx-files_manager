@@ -8,7 +8,9 @@ class UsersController {
 
     if (email === undefined) {
       res.status(400).json({ error: 'Missing email' });
-    } else if (password === undefined) {
+      return;
+    }
+    if (password === undefined) {
       res.status(400).json({ error: 'Missing password' });
       return;
     }
