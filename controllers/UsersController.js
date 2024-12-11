@@ -1,4 +1,6 @@
 import SHA1 from 'sha1';
+import { ObjectId } from 'mongodb';
+import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
 class UsersController {
@@ -43,6 +45,30 @@ class UsersController {
           });
       }
     });
+  }
+
+  static getMe(req, res) {
+    const token = req.get('X-Token');
+    const key = `auth_${token}`;
+    const { db } = dbClient;
+
+    redisClient.get(key)
+      .then((id) => {
+        // query users collection for userId passed
+        const userId = new ObjectId(id);
+        db.collection('users').find({ _id: userId }).toArray((err, docs) => {
+          if (err) throw err;
+          if (docs.length === 0) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+          }
+
+          res.json({ id: docs[0]._id, email: docs[0].email });
+        });
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 }
 
