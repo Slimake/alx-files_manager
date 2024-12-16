@@ -78,14 +78,14 @@ class FilesController {
               },
             );
         } else {
-          let folderPath = process.env.FOLDER_PATH;
+          const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
           const filename = uuidv4();
-          if (!folderPath) {
-            folderPath = '/tmp/files_manager';
-          }
           const localPath = `${folderPath}/${filename}`;
 
           const decodedData = Buffer.from(data, 'base64').toString('utf-8');
+          if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath);
+          }
           fs.writeFileSync(localPath, decodedData);
 
           dbClient.db
